@@ -196,7 +196,7 @@ class Client:
             code=code, redirect_uri=self.redirect_uri
         )
         session = OAuth2Session.from_data(data, state, self)
-        self.oauth2_sessions.append(session)
+        self.__oauth2_sessions.append(session)
         return session
 
     async def fetch_client_credentials_token(self) -> OAuth2Session:
@@ -207,7 +207,7 @@ class Client:
         """
         data = await self.http._get_client_credentials_token(self.scopes)
         session = OAuth2Session.from_data(data, None, self)
-        self.oauth2_sessions.append(session)
+        self.__oauth2_sessions.append(session)
         return session
 
     async def fetch_application_info(self) -> AppInfo:
