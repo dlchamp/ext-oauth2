@@ -14,6 +14,24 @@ if TYPE_CHECKING:
 BASE_OAUTH_AUTHORIZE_URL = "https://discord.com/oauth2/authorize?"
 
 
+# thanks disnake
+class _MissingSentinel:
+    def __eq__(self, other: Any) -> bool:
+        return False
+
+    def __hash__(self) -> int:
+        return 0
+
+    def __bool__(self) -> bool:
+        return False
+
+    def __repr__(self) -> str:
+        return "..."
+
+
+MISSING: Any = _MissingSentinel()
+
+
 class ResponseType(Enum):
     code = "code"
     token = "token"  # noqa: S105

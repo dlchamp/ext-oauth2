@@ -31,6 +31,7 @@ if TYPE_CHECKING:
         AddGuildMemberPayload,
         GroupDMChannel,
         CreateGroupDMPayload,
+        EditUserPayload,
     )
 
 __all__: Tuple[str, ...] = ("HTTPClient", "Route")
@@ -192,15 +193,10 @@ class HTTPClient:
         )
 
     async def _edit_user(
-        self, username: Optional[str], avatar: Optional[str], access_token: str
+        self,
+        access_token: str,
+        payload: EditUserPayload,
     ) -> User:
-        payload = {}
-
-        if username:
-            payload["username"] = username
-        if avatar:
-            payload["avatar"] = avatar
-
         return await self.request(
             Route("PATCH", "/users/@me"),
             payload=payload,

@@ -12,13 +12,14 @@ from oauth2.connection import (
     Connection,
 )
 from oauth2.guild import PartialGuild
+from oauth2.utils import MISSING
 
 if TYPE_CHECKING:
     from oauth2._http import HTTPClient
     from oauth2.file import File
     from oauth2.session import OAuth2Session
     from oauth2.types import User as UserData
-    from oauth2.types import PartialDMUser
+    from oauth2.types import PartialDMUser, EditUserPayload
 
 
 @attrs.define(slots=True, repr=True)
@@ -26,7 +27,7 @@ class User:
     _http: HTTPClient
     id: int
     username: str
-    discriminator: str  # deprecation will happen soon
+    discriminator: str  # deprecated
     bot: bool
     system: bool
     mfa_enabled: bool
@@ -40,7 +41,7 @@ class User:
     global_name: Optional[str] = None
     _avatar: Optional[str] = None
     _banner: Optional[str] = None
-    _accent_colour: Optional[str] = None
+    _accent_color: Optional[str] = None
 
     @classmethod
     def from_data(
@@ -64,7 +65,7 @@ class User:
             premium_type=data.get("premium_type", 0),
             _avatar=data.get("avatar"),
             _banner=data.get("banner"),
-            _accent_colour=data.get("accent_colour"),
+            _accent_color=data.get("accent_colour"),
         )
 
     @property
@@ -98,7 +99,7 @@ class User:
         if self._session:
             return self._session
 
-    async def _avatar_helper(self, file: Optional[File] = None) -> Optional[str]:
+    async def _file_helper(self, file: Optional[File] = None) -> Optional[str]:
         if not file:
             return
 
@@ -106,20 +107,27 @@ class User:
         await data
         encoded_bytes = base64.b64encode(data.result())
 
-        return f"data:{file.file_type};base64,{encoded_bytes}"
+        return f"data:image/{file.file_type};base64,{encoded_bytes}"
 
     async def edit(
-        self, username: Optional[str] = None, avatar: Optional[File] = None
+        self,
+        username: str = MISSING,
+        avatar: Optional[File] = MISSING,
+        banner: Optional[File] = MISSING,
     ) -> User:
         if not self._session:
             raise AttributeError(
                 "This user object can't be edited because it doesn't have a `session` linked."
             )
+        payload: EditUserPayload = {}
 
-        avatar_data = await self._avatar_helper(avatar)
-        data = await self._http._edit_user(
-            username, avatar_data, self._session.access_token
-        )
+        if username is not MISSING:
+            payload["username"] = username
+        if avatar is not MISSING:
+            payload["avatar"] = await self._file_helper(avatar)
+        if banner is not MISSING:
+            payload["banner"] = await self._file_helper(banner)
+        data = await self._http._edit_user(self._session.access_token, payload)
         return User.from_data(data, self._http, self._session)
 
     async def guilds(

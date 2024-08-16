@@ -1,4 +1,4 @@
-from typing import Tuple, TypedDict, List
+from typing import Tuple, TypedDict, List, Optional
 
 from typing_extensions import NotRequired
 
@@ -18,6 +18,7 @@ __all__: Tuple[str, ...] = (
     "AppRoleConnectionPayload",
     "AddGuildMemberPayload",
     "CreateGroupDMPayload",
+    "EditUserPayload",
 )
 
 
@@ -91,3 +92,9 @@ class AddGuildMemberPayload(TypedDict):
 class CreateGroupDMPayload(TypedDict):
     access_tokens: List[str]
     nicks: List[Nick]
+
+
+class EditUserPayload(TypedDict, total=False):
+    username: str
+    avatar: Optional[str]
+    banner: Optional[str]
