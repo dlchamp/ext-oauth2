@@ -173,9 +173,9 @@ class OAuth2Session:
 
         await self._client.http._add_group_dm_user(
             channel_id,
-            user_id if user_id else user.id,
+            user_id if user_id else user.id,  # type: ignore
             self.access_token,
-            nick if nick else user.username,
+            nick if nick else user.username,  # type: ignore
         )
 
     async def remove_current_user_from_group_dm(
@@ -185,5 +185,5 @@ class OAuth2Session:
             user = await self.fetch_current_user()
 
         await self._client.http._remove_group_dm_user(
-            channel_id, user_id if user_id else user.id
+            channel_id, user_id if user_id else user.id  # type: ignore
         )
