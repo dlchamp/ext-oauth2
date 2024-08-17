@@ -204,7 +204,7 @@ class HTTPClient:
             access_token=access_token,
         )
 
-    async def _get_user_guids(
+    async def _get_user_guilds(
         self,
         before: Optional[int],
         after: Optional[int],
